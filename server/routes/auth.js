@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const User = require('../model/User.js')
 const bcrypt = require('bcryptjs')
+const verify = require('./verifyToken.js')
 const jwt = require('jsonwebtoken')
 const Analyze = require('../model/Analyze.js')
 const { registerValidation, loginValidation } = require('../validation.js')
@@ -51,5 +52,17 @@ router.post('/login', async(req, res) => {
   // create and assign a token
   const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: 60*60})
   res.header('auth-token', token).send(token)
+})
+
+router.post('/getuser',verify, async(req, res) => {
+  const verified = jwt.verify(req.header('auth-token'), process.env.TOKEN_SECRET)
+  req.user = verified
+  console.log(verified)
+  const user = await User.findOne({_id: verified._id})
+  console.log(user)
+  res.status(200).send({
+    name: user.name,
+    email: user.email
+  })
 })
 module.exports = router

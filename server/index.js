@@ -6,6 +6,7 @@ const foodList = require('./routes/foodList.js')
 const auth = require('./routes/auth.js')
 const posts = require('./routes/posts.js')
 const check = require('./routes/loginCheck.js')
+const target = require('./routes/target.js')
 const dotenv = require('dotenv')
 
 dotenv.config()
@@ -26,6 +27,7 @@ app.use('/api/foodlist', foodList)
 app.use('/api/auth', auth)
 app.use('/api/posts', posts)
 app.use('/api/check', check)
+app.use('/api/target', target)
 
 
 const port = process.env.PORT || 5000
