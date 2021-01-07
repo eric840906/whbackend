@@ -4,9 +4,14 @@ const bcrypt = require('bcryptjs')
 const verify = require('./verifyToken.js')
 const jwt = require('jsonwebtoken')
 const Analyze = require('../model/Analyze.js')
+const multer = require('multer')
 const { registerValidation, loginValidation } = require('../validation.js')
 
-
+const upload = multer({
+  limit: {
+    fileSize: 1000000  // 1MB
+  }
+})
 
 // register
 router.post('/register', async(req, res) => {
@@ -54,7 +59,9 @@ router.post('/login', async(req, res) => {
   res.header('auth-token', token).send(token)
 })
 
-router.post('/getuser',verify, async(req, res) => {
+
+//get info
+router.post('/getuser', verify, async(req, res) => {
   const verified = jwt.verify(req.header('auth-token'), process.env.TOKEN_SECRET)
   req.user = verified
   console.log(verified)
@@ -62,7 +69,31 @@ router.post('/getuser',verify, async(req, res) => {
   console.log(user)
   res.status(200).send({
     name: user.name,
-    email: user.email
+    email: user.email,
+    image: user.avatar
   })
+})
+
+//upload avatar
+router.post('/avatar', verify, upload.single('avatar'), async(req, res) => {
+  const verified = jwt.verify(req.header('auth-token'), process.env.TOKEN_SECRET)
+  req.user = verified
+  console.log(verified)
+  User.updateOne({_id: verified._id}, {avatar: req.file.buffer}, (err) => {
+    if(err) {
+      res.status(400).send(err)
+    } else {
+      res.status(200).send('avatar updated')
+    }
+  })
+})
+
+//get avatar
+router.get('/avatar', verify, async(req, res) => {
+  const verified = jwt.verify(req.header('auth-token'), process.env.TOKEN_SECRET)
+  req.user = verified
+  console.log(verified)
+  const user = await User.findOne({_id: verified._id})
+  res.send(user.avatar)
 })
 module.exports = router
