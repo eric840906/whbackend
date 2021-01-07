@@ -14,32 +14,32 @@ const upload = multer({
 })
 
 // register
-router.post('/register', async(req, res) => {
-  // validate before sending
-  const { error } = registerValidation(req.body)
-  if(error) return res.status(400).send(error.details[0].message)
+// router.post('/register', async(req, res) => {
+//   // validate before sending
+//   const { error } = registerValidation(req.body)
+//   if(error) return res.status(400).send(error.details[0].message)
   
-  //check duplicate email
-  const emailExist = await User.findOne({email: req.body.email})
-  if(emailExist) return res.status(400).send('email used')
+//   //check duplicate email
+//   const emailExist = await User.findOne({email: req.body.email})
+//   if(emailExist) return res.status(400).send('email used')
   
-  // hash password
-  const salt = await bcrypt.genSalt(10)
-  const hashedPassword = await bcrypt.hash(req.body.password, salt)
+//   // hash password
+//   const salt = await bcrypt.genSalt(10)
+//   const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-  // create user data
-  const user = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: hashedPassword
-  }) 
-  try {
-    const savedUser = await user.save()
-    res.send({ user: user._id })
-  } catch (error) {
-    res.status(404).send(error)
-  }
-})
+//   // create user data
+//   const user = new User({
+//     name: req.body.name,
+//     email: req.body.email,
+//     password: hashedPassword
+//   }) 
+//   try {
+//     const savedUser = await user.save()
+//     res.send({ user: user._id })
+//   } catch (error) {
+//     res.status(404).send(error)
+//   }
+// })
 
 // login
 router.post('/login', async(req, res) => {
